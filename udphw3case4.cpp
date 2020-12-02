@@ -1,3 +1,5 @@
+//Crated by Jayden Stipek and Duncan Spani 
+// 12/2/2020
 #include <iostream>
 #include "UdpSocket.h"
 #include "Timer.h"
