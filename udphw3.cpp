@@ -8,13 +8,13 @@
 
 using namespace std;
 
-   /**
-     * sends message[] and receives an acknowledgment from the server max
-     * If the client cannot receive an acknowledgement immedietly
-     * it should start a Timer. If a timeout occurs (i.e., no response after 1500 usec)
-     * the client must resend the same message. The function must count the number of messages retransmitted and
-     * return it to the main function as its return value.
-     **/
+/**
+ * sends message[] and receives an acknowledgment from the server max
+ * If the client cannot receive an acknowledgement immedietly
+ * it should start a Timer. If a timeout occurs (i.e., no response after 1500 usec)
+ * the client must resend the same message. The function must count the number of messages retransmitted and
+ * return it to the main function as its return value.
+ **/
 int clientStopWait( UdpSocket &sock, const int max, int message[] )
 {
  
@@ -62,7 +62,6 @@ int clientStopWait( UdpSocket &sock, const int max, int message[] )
  * repeats receiving message[] and sending an acknowledgment at a server side max (=20,000) times using the sock object.
  * 
 **/
-
 void serverReliable( UdpSocket &sock, const int max, int message[] )
 {
     cout << "inside serverReliable" << endl;    
@@ -86,12 +85,68 @@ void serverReliable( UdpSocket &sock, const int max, int message[] )
          }
     }
 }
+
+/**
+ *sends message[] and receiving an acknowledgment from a server max (=20,000) times using the sock object.
+ * As described above, the client can continuously send a new message[] and increasing the sequence number as long as the number of in-transit messages (i.e., # of unacknowledged messages) is less than "windowSize." 
+ * That number should be decremented every time the client receives an acknowledgment. If the number of unacknowledged messages reaches "windowSize," the client should start a Timer. If a timeout occurs (i.e., no response after 1500 usec), 
+ * it must resend the message with the minimum sequence number among those which have not yet been acknowledged. 
+ * The function must count the number of messages (not bytes) re-transmitted and return it to the main function as its return value. 
+ **/
 int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int windowSize )
 {
+    cout << "beginning clientSlidingWindow" << endl;
     int resubmissions = 0;
+    int unacknowledged = 0;
+    int acknowledgements = 0;
+    for(int i = 0; i < max; i++)
+    {
+        int sent;
+        if(unacknowledged < windowSize)//if the unacknowledged messages is less than windowsize 
+        {
+            message[0] = i; //insert the message into message[0]
+            sent = sock.sendTo((char*) message, MSGSIZE); //send the message to the server
+            unacknowledged++;
+        }
+        else 
+        {
+            Timer timer;
+            timer.start();
+            while(true)
+            {
+            int responseData = sock.pollRecvFrom(); //Any data been recieved?
+            if(responseData > 0)
+            {
+                sock.recvFrom((char * )message, MSGSIZE);
+                if(message[0] == acknowledgements)
+                {
+                    acknowledgements++; //increase the amount acknowledged
+                    unacknowledged--; //take away from the for loop total     
+                    break; //response is true and then cut the while loop
+                }
+            }
+            if(timer.lap() > TIMEOUT && unacknowledged >= windowSize) //If we go over the 1500 Timeout 
+            {
+                    resubmissions += (i + windowSize - acknowledgements); //add to resubmissions count
+                    i = acknowledgements; //resetting back to the last correctly submitted ack 
+                    unacknowledged = 0; //go back to last valid ack
+                    break;
+                }       
+            }
+        }
+    }
+    cout << "finishing" << endl;
     return resubmissions;
 }
+/**
+ * receives message[] and sends an acknowledgment to the client max (=20,000) times using the sock object. E
+ * Every time the server receives a new message[], it must save the message's sequence number in an array and return a cumulative acknowledgment, i.e.,
+ * the last received message in order.
+ * 
+ * 
+ **/
 void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int windowSize )
 {
+    
     return;
 }
