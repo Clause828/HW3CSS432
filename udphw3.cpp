@@ -115,8 +115,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
             timer.start();
             while(true)
             {
-                int responseData = sock.pollRecvFrom(); //Any data been recieved?
-                if(responseData > 0)
+                if(sock.pollRecvFrom() > 0)
                 {
                     cout << "recieved data " << endl;
                     sock.recvFrom((char * )message, MSGSIZE);
@@ -151,32 +150,25 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
 void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int windowSize )
 {
     cout << "inside Server EarlyRetrans" << endl;
-    int cumAck[40000];
+    int cumAck[max];
     int count = 0;
-    for(int i = 0; i < max; i++)
+    while(message[0] != max)
     {
-        while(true)
+        if(sock.pollRecvFrom() > 0)
         {
-            int recievedData = 0;
-            recievedData = sock.pollRecvFrom(); //Any data been recieved?
-            if(recievedData > 0)
-            {
-                //cout << "message recieved" << endl;
-                sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
-                //cout << "message: " << message[0] << "  I: " << i << endl;
-                if(message[0] == count){
-                    cout << "acknolewgement sent" << endl; //never gets in here
-                    sock.ackTo((char *) &message[i], sizeof(message[i])); //if data has been receievd then I need to send it acknoledge it 
-                    cumAck[count] = i;
-                    count++;
-                    break;
-                }else
-                {
-
-                    sock.ackTo((char *) &count, sizeof(count)); //if message[0] != count 2 != 3
-                    continue;
-                }                
+            //cout << "message recieved" << endl;
+            sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
+            //cout << "message: " << message[0] << " count: "  << count << endl;
+            if(message[0] == count){
+                cout << "acknolegment sent" << endl; //never gets in here
+                sock.ackTo((char *) &count, sizeof(count)); //if data has been receievd then I need to send it acknoledge it 
+                cumAck[count] = message[0];
+                count++;
             }
-        }
+            else
+            {
+                sock.ackTo((char *) &count, sizeof(count)); //if message[0] != count 2 != 3
+            }
+        }   
     }
 }
