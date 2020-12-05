@@ -101,36 +101,40 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
     int acknowledgements = 0;
     for(int i = 0; i < max; i++)
     {
-        int sent;
         if(unacknowledged < windowSize)//if the unacknowledged messages is less than windowsize 
         {
             message[0] = i; //insert the message into message[0]
-            sent = sock.sendTo((char*) message, MSGSIZE); //send the message to the server
+            sock.sendTo((char*) message, MSGSIZE); //send the message to the server
             unacknowledged++;
         }
-        else 
+
+        if(unacknowledged == windowSize) //has to be another if statment here otherwise breaks
         {
+            cout << "unacknowledged is equal to windowsize" << endl;
             Timer timer;
             timer.start();
             while(true)
             {
-            int responseData = sock.pollRecvFrom(); //Any data been recieved?
-            if(responseData > 0)
-            {
-                sock.recvFrom((char * )message, MSGSIZE);
-                if(message[0] == acknowledgements)
+                int responseData = sock.pollRecvFrom(); //Any data been recieved?
+                if(responseData > 0)
                 {
-                    acknowledgements++; //increase the amount acknowledged
-                    unacknowledged--; //take away from the for loop total     
-                    break; //response is true and then cut the while loop
+                    cout << "recieved data " << endl;
+                    sock.recvFrom((char * )message, MSGSIZE);
+                    if(message[0] == acknowledgements)
+                    {
+                        cout << "correct message couting as acknolegement" << endl;
+                        acknowledgements++; //increase the amount acknowledged
+                        unacknowledged--; //take away from the for loop total     
+                        break; //response is true and then cut the while loop
+                    }
                 }
-            }
-            if(timer.lap() > TIMEOUT && unacknowledged >= windowSize) //If we go over the 1500 Timeout 
-            {
-                    resubmissions += (i + windowSize - acknowledgements); //add to resubmissions count
+                if(timer.lap() > TIMEOUT && unacknowledged == windowSize) //If we go over the 1500 Timeout 
+                {
+                    cout << "Timed Out resending message" << endl;
+                    resubmissions = resubmissions + (i + windowSize - acknowledgements); //add to resubmissions count
                     i = acknowledgements; //resetting back to the last correctly submitted ack 
                     unacknowledged = 0; //go back to last valid ack
-                    break;
+                    continue;
                 }       
             }
         }
@@ -139,7 +143,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
     return resubmissions;
 }
 /**
- * receives message[] and sends an acknowledgment to the client max (=20,000) times using the sock object. E
+ * receives message[] and sends an acknowledgment to the client max (=20,000) times using the sock object. 
  * Every time the server receives a new message[], it must save the message's sequence number in an array and return a cumulative acknowledgment, 
  * i.e.,* the last received message in order.
  * 
@@ -159,7 +163,9 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
             {
                 cout << "message recieved" << endl;
                 sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
+                cout << "message: " << message[0] << "  I: " << i << endl;
                 if(message[0] == i){
+                    cout << "acknolewgement sent" << endl; //never gets in here
                     sock.ackTo((char *) &i, sizeof(i)); //if data has been receievd then I need to send it acknoledge it 
                     cumAck[count] = i;
                     count++;
@@ -168,4 +174,5 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
             }
         }
     }
+    sock.ackTo((char *)&cumAck, sizeof(cumAck)); //cumlative acknowledgement
 }
