@@ -1,11 +1,39 @@
-beginning clientStopWait
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
-inside While loop
+beginning clientSlidingWindow
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+recieved data 
+correct message couting as acknolegement
+unacknowledged is equal to windowsize
+Timed Out resending message

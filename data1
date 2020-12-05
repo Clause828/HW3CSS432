@@ -1,6 +1,0 @@
-Cannot bind the local address to the UDP socket.
-Choose a testcase
-   1: unreliable test
-   2: stop-and-wait test
-   3: sliding windows
---> 

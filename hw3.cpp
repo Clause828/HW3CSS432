@@ -5,7 +5,8 @@
 
 using namespace std;
 
-#define PORT 50382       // my UDP port (5 digits of student ID)
+// PORT CHANGED TO FIT UWB SERVERS
+#define PORT 5382       // my UDP port (5 digits of student ID)
 #define MAX 20000        // times of message transfer
 #define MAXWIN 30        // the maximum window size
 #define LOOP 10          // loop in test 4 and 5
