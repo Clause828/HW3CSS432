@@ -140,13 +140,32 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
 }
 /**
  * receives message[] and sends an acknowledgment to the client max (=20,000) times using the sock object. E
- * Every time the server receives a new message[], it must save the message's sequence number in an array and return a cumulative acknowledgment, i.e.,
- * the last received message in order.
- * 
+ * Every time the server receives a new message[], it must save the message's sequence number in an array and return a cumulative acknowledgment, 
+ * i.e.,* the last received message in order.
  * 
  **/
 void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int windowSize )
 {
-    
-    return;
+    cout << "inside Server EarlyRetrans" << endl;
+    int cumAck[] = {};
+    int count = 0;
+    for(int i = 0; i < max; i++)
+    {
+        while(true)
+        {
+            int recievedData = 0;
+            recievedData = sock.pollRecvFrom(); //Any data been recieved?
+            if(recievedData > 0)
+            {
+                cout << "message recieved" << endl;
+                sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
+                if(message[0] == i){
+                    sock.ackTo((char *) &i, sizeof(i)); //if data has been receievd then I need to send it acknoledge it 
+                    cumAck[count] = i;
+                    count++;
+                    break;
+                } 
+            }
+        }
+    }
 }

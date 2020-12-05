@@ -102,7 +102,7 @@ int main( int argc, char *argv[] ) {
       break;
     case 3:
       for ( int windowSize = 1; windowSize <= MAXWIN; windowSize++ )
-	serverEarlyRetrans( sock, MAX, message, windowSize );
+	      serverEarlyRetrans( sock, MAX, message, windowSize );
       break;
     default:
       cerr << "no such test case" << endl;
