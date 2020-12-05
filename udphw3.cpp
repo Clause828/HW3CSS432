@@ -152,7 +152,7 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
     cout << "inside Server EarlyRetrans" << endl;
     int cumAck[max];
     int count = 0;
-    while(message[0] != max)
+    while(count != max)
     {
         if(sock.pollRecvFrom() > 0)
         {
@@ -160,7 +160,7 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
             sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
             //cout << "message: " << message[0] << " count: "  << count << endl;
             if(message[0] == count){
-                cout << "acknolegment sent" << endl; //never gets in here
+                //cout << "acknolegment sent" << endl; //never gets in here
                 sock.ackTo((char *) &count, sizeof(count)); //if data has been receievd then I need to send it acknoledge it 
                 cumAck[count] = message[0];
                 count++;
