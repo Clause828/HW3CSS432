@@ -151,7 +151,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
 void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int windowSize )
 {
     cout << "inside Server EarlyRetrans" << endl;
-    int cumAck[] = {};
+    int cumAck[40000];
     int count = 0;
     for(int i = 0; i < max; i++)
     {
@@ -161,18 +161,22 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
             recievedData = sock.pollRecvFrom(); //Any data been recieved?
             if(recievedData > 0)
             {
-                cout << "message recieved" << endl;
+                //cout << "message recieved" << endl;
                 sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
-                cout << "message: " << message[0] << "  I: " << i << endl;
-                if(message[0] == i){
+                //cout << "message: " << message[0] << "  I: " << i << endl;
+                if(message[0] == count){
                     cout << "acknolewgement sent" << endl; //never gets in here
-                    sock.ackTo((char *) &i, sizeof(i)); //if data has been receievd then I need to send it acknoledge it 
+                    sock.ackTo((char *) &message[i], sizeof(message[i])); //if data has been receievd then I need to send it acknoledge it 
                     cumAck[count] = i;
                     count++;
                     break;
-                } 
+                }else
+                {
+
+                    sock.ackTo((char *) &count, sizeof(count)); //if message[0] != count 2 != 3
+                    continue;
+                }                
             }
         }
     }
-    sock.ackTo((char *)&cumAck, sizeof(cumAck)); //cumlative acknowledgement
 }
