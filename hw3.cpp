@@ -7,7 +7,7 @@ using namespace std;
 
 // PORT CHANGED TO FIT UWB SERVERS
 #define PORT 5382        // my UDP port (5 digits of student ID)
-#define MAX 2000        // times of message transfer
+#define MAX 10000        // times of message transfer
 #define MAXWIN 30        // the maximum window size
 #define LOOP 10          // loop in test 4 and 5
 
@@ -82,8 +82,8 @@ int main( int argc, char *argv[] ) {
 	retransmits =
 	clientSlidingWindow( sock, MAX, message, windowSize ); // actual test
 	cerr << "Window size = "; // lap timer
-    cerr << windowSize << " ";
-	cout << windowSize << " ";
+  cerr << windowSize << " ";
+  cout << windowSize << " ";
 	cerr << "Elasped time = "; 
 	cout << timer.lap( ) << endl;
 	cerr << "retransmits = " << retransmits << endl;
@@ -122,7 +122,6 @@ int main( int argc, char *argv[] ) {
   }
 
   cerr << "finished" << endl;
-
   return 0;
 }
 

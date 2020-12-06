@@ -119,6 +119,10 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
                 if(sock.pollRecvFrom() > 0)
                 {
                     sock.recvFrom((char *)message, MSGSIZE);
+                    if(message[0] < 0) {//The server is done
+                        i = max; 
+                        break;
+                    }
                     cerr << "recieved data " << message[0] << " acknowledgements " << acknowledgements << endl;
                     if(message[0] == acknowledgements)
                     {
@@ -132,7 +136,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
                 {
                     cerr << "Timed Out resending message" << endl;
                     resubmissions = resubmissions + (i + windowSize - acknowledgements); //add to resubmissions count
-                    i = acknowledgements + 1; //resetting back to the last correctly submitted ack 
+                    i = acknowledgements; //resetting back to the last correctly submitted ack 
                     unacknowledged = 0; //go back to last valid ack
                     cerr << "after acknolegements i: " << i << endl;
                     break;
@@ -170,8 +174,10 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
             else
             {
                 sock.ackTo((char *) &count, sizeof(count)); //if message[0] != count 2 != 3
-                count++;
+                count++; //not sure
             }
         }   
     }
+    count = -1;
+    sock.ackTo((char* ) &count, sizeof(count));
 }
