@@ -101,6 +101,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
     int acknowledgements = 0;
     for(int i = 0; i < max; i++)
     {
+        cout << "unacknowledged: " << unacknowledged << "windowsize: " << windowSize << endl;
         if(unacknowledged < windowSize)//if the unacknowledged messages is less than windowsize
         {
             message[0] = i; //insert the message into message[0]
@@ -108,9 +109,8 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
             unacknowledged++;
         }
 
-        if(unacknowledged == windowSize) //has to be another if statment here otherwise breaks
+        if(unacknowledged == windowSize) //If the sliding window is full 
         {
-            cout << "unacknowledged is equal to windowsize" << endl;
             Timer timer;
             timer.start();
             while(true)
@@ -129,11 +129,12 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
                 }
                 if(timer.lap() > TIMEOUT && unacknowledged == windowSize) //If we go over the 1500 Timeout
                 {
-                    cout << "Timed Out resending message" << endl;
+                   // cout << "Timed Out resending message" << endl;
                     resubmissions = resubmissions + (i + windowSize - acknowledgements); //add to resubmissions count
-                    i = acknowledgements; //resetting back to the last correctly submitted ack
+                    i = acknowledgements + 1; //resetting back to the last correctly submitted ack
+                    //cout << "after acknolegements i:  " << i << endl;
                     unacknowledged = 0; //go back to last valid ack
-                    continue;
+                    break;
                 }
             }
         }

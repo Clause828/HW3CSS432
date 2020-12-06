@@ -101,6 +101,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
     int acknowledgements = 0;
     for(int i = 0; i < max; i++)
     {
+        cout << "unacknowledged: " << unacknowledged << "windowsize: " << windowSize << endl;
         if(unacknowledged < windowSize)//if the unacknowledged messages is less than windowsize 
         {
             message[0] = i; //insert the message into message[0]
@@ -110,7 +111,6 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
 
         if(unacknowledged == windowSize) //has to be another if statment here otherwise breaks
         {
-            cout << "unacknowledged is equal to windowsize" << endl;
             Timer timer;
             timer.start();
             while(true)
@@ -118,7 +118,7 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
                 if(sock.pollRecvFrom() > 0)
                 {
                     cout << "recieved data " << endl;
-                    sock.recvFrom((char * )message, MSGSIZE);
+                    sock.recvFrom((char *)message, MSGSIZE);
                     if(message[0] == acknowledgements)
                     {
                         cout << "correct message couting as acknolegement" << endl;
@@ -131,9 +131,10 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
                 {
                     cout << "Timed Out resending message" << endl;
                     resubmissions = resubmissions + (i + windowSize - acknowledgements); //add to resubmissions count
-                    i = acknowledgements; //resetting back to the last correctly submitted ack 
+                    i = acknowledgements + 1; //resetting back to the last correctly submitted ack 
                     unacknowledged = 0; //go back to last valid ack
-                    continue;
+                    cout << "after acknolegements i:  " << i << endl;
+                    break;
                 }       
             }
         }
@@ -158,9 +159,9 @@ void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int wind
         {
             //cout << "message recieved" << endl;
             sock.recvFrom((char*) message, MSGSIZE)  ; //recieve the information
-            //cout << "message: " << message[0] << " count: "  << count << endl;
+            cout << "message: " << message[0] << " count: "  << count << endl;
             if(message[0] == count){
-                //cout << "acknolegment sent" << endl; //never gets in here
+                cout << "acknolegment sent" << endl; //never gets in here
                 sock.ackTo((char *) &count, sizeof(count)); //if data has been receievd then I need to send it acknoledge it 
                 cumAck[count] = message[0];
                 count++;
