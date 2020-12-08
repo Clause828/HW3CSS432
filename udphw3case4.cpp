@@ -1,6 +1,9 @@
-//Created by Jayden Stipek and Duncan Spani 
-// 12/2/2020
-// CSS432 HW3
+/**Created by Jayden Stipek and Duncan Spani 
+* 12/2/2020
+* CSS432 HW3
+* Implementation file for the class that implements stopNwait and SlidingWindow
+* Client and Server
+**/
 #include <iostream>
 #include "udphw3.h"
 
@@ -14,6 +17,10 @@ using namespace std;
  * it should start a Timer. If a timeout occurs (i.e., no response after 1500 usec)
  * the client must resend the same message. The function must count the number of messages retransmitted and
  * return it to the main function as its return value.
+ * @param socket the udp socket send data from
+ * @param int the maximum number of time (messages) to send
+ * @param message the message buffer
+ * @return number of retransmissions
  **/
 int clientStopWait( UdpSocket &sock, const int max, int message[] )
 {
@@ -60,7 +67,9 @@ int clientStopWait( UdpSocket &sock, const int max, int message[] )
 
 /**
  * repeats receiving message[] and sending an acknowledgment at a server side max (=20,000) times using the sock object.
- *
+ * @param socket the udp socket send data to
+ * @param int the maximum number of time (messages) to receive
+ * @param message the message buffer to receive
 **/
 void serverReliable( UdpSocket &sock, const int max, int message[] )
 {
@@ -92,6 +101,11 @@ void serverReliable( UdpSocket &sock, const int max, int message[] )
  * That number should be decremented every time the client receives an acknowledgment. If the number of unacknowledged messages reaches "windowSize," the client should start a Timer. If a timeout occurs (i.e., no response after 1500 usec),
  * it must resend the message with the minimum sequence number among those which have not yet been acknowledged.
  * The function must count the number of messages (not bytes) re-transmitted and return it to the main function as its return value.
+ * @param socket the udp socket send data from
+ * @param int the maximum number of time (messages) to send
+ * @param message the message buffer
+ * @param windowsize the windowSize to the send the data
+ * @return number of retransmission
  **/
 int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int windowSize )
 {
@@ -150,7 +164,10 @@ int clientSlidingWindow( UdpSocket &sock, const int max, int message[], int wind
  where N is every integer from 0 to 10. You will also need to modify the output of hw3case4.cpp so that it outputs the drop percentage 
  (instead of the window size) into the file.
   You can simulate a drop by just not returning an ACK when you receive a packet.
- * 
+ * @param socket the udp socket retrieve data from
+ * @param int the maximum number of time (messages) to retrieve
+ * @param message the message buffer
+ * @param windowsize the windowSize to the retrieve the data
  **/
 void serverEarlyRetrans( UdpSocket &sock, const int max, int message[], int windowSize )
 {
